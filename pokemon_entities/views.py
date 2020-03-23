@@ -29,9 +29,7 @@ def show_all_pokemons(request):
     pokemons_on_page = []
 
     for pokemon in pokemons:
-        try:
-            url = pokemon.image.url
-        except ValueError: pass
+        url = pokemon.image.url
         pokemons_on_page.append({
             'pokemon_id': pokemon.id,
             'img_url': url,
@@ -51,14 +49,11 @@ def show_all_pokemons(request):
 
 
 def show_pokemon(request, pokemon_id):
-    
     try:
         requested_pokemon = Pokemon.objects.get(id=int(pokemon_id))
     except HttpResponseNotFound:
         print('<h1>Такой покемон не найден</h1>')
-    try:
-        url = requested_pokemon.image.url
-    except ValueError: pass
+    url = requested_pokemon.image.url
     try:
         prev_evolution = {
             'title_ru': requested_pokemon.previous_evolution.title,
@@ -93,10 +88,8 @@ def show_pokemon(request, pokemon_id):
 
     pokemon_entities = PokemonEntity.objects.filter(pokemon=requested_pokemon)
     for pokemon_entity in pokemon_entities:
-        try:
-            url = pokemon_entity.pokemon.image.url
-            full_url = request.build_absolute_uri(url)
-        except ValueError: pass
+        url = pokemon_entity.pokemon.image.url
+        full_url = request.build_absolute_uri(url)
         add_pokemon(
                 folium_map, pokemon_entity.lat, pokemon_entity.lon,
                 requested_pokemon.title, full_url)
