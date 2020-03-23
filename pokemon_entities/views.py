@@ -69,7 +69,7 @@ def show_pokemon(request, pokemon_id):
         prev_evolution = None
 
     try:    
-        next_pokemon = requested_pokemon.next_evolution.get()
+        next_pokemon = requested_pokemon.next_evolutions.get()
         next_evolution = {
             'title_ru': next_pokemon.title,
             'pokemon_id': next_pokemon.id,
