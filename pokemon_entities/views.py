@@ -53,40 +53,40 @@ def show_pokemon(request, pokemon_id):
         requested_pokemon = Pokemon.objects.get(id=int(pokemon_id))
     except HttpResponseNotFound:
         print('<h1>Такой покемон не найден</h1>')
+
     url = requested_pokemon.image.url
-    try:
+
+    pokemon_on_page = {
+            'pokemon_id': requested_pokemon.id,
+            'img_url': url,
+            'title_ru': requested_pokemon.title,
+            'title_en': requested_pokemon.title_en,
+            'title_jp': requested_pokemon.title_jp,
+            'description': requested_pokemon.description,
+    }
+
+    previous_pokemon = requested_pokemon.previous_evolution
+    if previous_pokemon:
         prev_evolution = {
             'title_ru': requested_pokemon.previous_evolution.title,
             'pokemon_id': requested_pokemon.previous_evolution.id,
             'img_url': requested_pokemon.previous_evolution.image.url
         }
-    except AttributeError: 
-        prev_evolution = None
-
-    try:    
-        next_pokemon = requested_pokemon.next_evolutions.get()
+        pokemon_on_page.update({'previous_evolution': prev_evolution})
+    
+    next_pokemon = requested_pokemon.next_evolutions.first()
+    if next_pokemon:
         next_evolution = {
             'title_ru': next_pokemon.title,
             'pokemon_id': next_pokemon.id,
             'img_url': next_pokemon.image.url
         }
-    except Pokemon.DoesNotExist:
-        next_evolution = None
-
-    pokemon_on_page = {
-        'pokemon_id': requested_pokemon.id,
-        'img_url': url,
-        'title_ru': requested_pokemon.title,
-        'title_en': requested_pokemon.title_en,
-        'title_jp': requested_pokemon.title_jp,
-        'description': requested_pokemon.description,
-        'previous_evolution': prev_evolution,
-        'next_evolution': next_evolution,
-    }
+        pokemon_on_page.update({'next_evolution': next_evolution})
 
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)    
 
-    pokemon_entities = PokemonEntity.objects.filter(pokemon=requested_pokemon)
+    pokemon_entities = requested_pokemon.pokemon_entities.all()
+
     for pokemon_entity in pokemon_entities:
         url = pokemon_entity.pokemon.image.url
         full_url = request.build_absolute_uri(url)
